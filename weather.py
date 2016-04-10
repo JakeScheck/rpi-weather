@@ -217,8 +217,8 @@ class SmDisplay:
 
 	####################################################################
 	def disp_weather(self):
-		# Fill the screen with white
-		self.screen.fill( (255,255,255) )
+		# Fill the screen with gray
+		self.screen.fill( (200,200,200) )
 		xmin = 0
 		xmax = self.xmax
 		ymax = self.ymax
@@ -348,7 +348,7 @@ class SmDisplay:
 			yo = (90 - iy) / 2 
 		else: 
 			yo = 0
-		self.screen.blit( icon, (xmax*wx-ix/2,ymax*(wy+gp*1.2)+yo) )
+		self.screen.blit( icon, (xmax*wx-ix/2,ymax*(wy+gp*1)+yo) ) # was wy+gp*1.2
 
 		# Sub Window 2
 		txt = font.render( self.day[1]+':', True, fc )
