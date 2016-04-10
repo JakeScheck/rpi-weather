@@ -320,8 +320,9 @@ class SmDisplay:
 		th = 	self.subwinTh		# Text Height
 		rpth = 	0.050			# Rain Present Text Height
 		gp = 	0.055			# Line Spacing Gap
-		ro = 	0.010 * xmax   	# "Rain:" Text Window Offset winthin window. 
+		ro = 	0.010 * xmax   		# "Rain:" Text Window Offset winthin window. 
 		rpl =	5.95			# Rain percent line offset.
+		ils =	0.7			# icon location scaling factor; original value was 1.2
 
 		font = pygame.font.SysFont( fn, int(ymax*th), bold=1 )
 		rpfont = pygame.font.SysFont( fn, int(ymax*rpth), bold=1 )
@@ -348,7 +349,7 @@ class SmDisplay:
 			yo = (90 - iy) / 2 
 		else: 
 			yo = 0
-		self.screen.blit( icon, (xmax*wx-ix/2,ymax*(wy+gp*0.8)+yo) ) # was wy+gp*1.2
+		self.screen.blit( icon, (xmax*wx-ix/2,ymax*(wy+gp*ils)+yo) )
 
 		# Sub Window 2
 		txt = font.render( self.day[1]+':', True, fc )
@@ -371,7 +372,7 @@ class SmDisplay:
 			yo = (90 - iy) / 2 
 		else: 
 			yo = 0
-		self.screen.blit( icon, (xmax*wx*3-ix/2,ymax*(wy+gp*0.8)+yo) )
+		self.screen.blit( icon, (xmax*wx*3-ix/2,ymax*(wy+gp*ils)+yo) )
 
 		# Sub Window 3
 		txt = font.render( self.day[2]+':', True, fc )
@@ -394,7 +395,7 @@ class SmDisplay:
 			yo = (90 - iy) / 2 
 		else: 
 			yo = 0
-		self.screen.blit( icon, (xmax*wx*5-ix/2,ymax*(wy+gp*0.8)+yo) )
+		self.screen.blit( icon, (xmax*wx*5-ix/2,ymax*(wy+gp*ils)+yo) )
 
 		# Sub Window 4
 		txt = font.render( self.day[3]+':', True, fc )
@@ -417,7 +418,7 @@ class SmDisplay:
 			yo = (90 - iy) / 2 
 		else: 
 			yo = 0
-		self.screen.blit( icon, (xmax*wx*7-ix/2,ymax*(wy+gp*0.8)+yo) )
+		self.screen.blit( icon, (xmax*wx*7-ix/2,ymax*(wy+gp*ils)+yo) )
 
 		# Update the display
 		pygame.display.update()
