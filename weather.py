@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 ### BEGIN LICENSE
-#Copyright (c) 2014 Jim Kemp <kemp.jim@gmail.com>
+# Copyright (c) 2016 Jake Scheckman <jacob.scheckman@gmail.com>
+# based on code Copyright (c) 2014 Jim Kemp <kemp.jim@gmail.com>
 
 #Permission is hereby granted, free of charge, to any person
 #obtaining a copy of this software and associated documentation
@@ -47,12 +48,6 @@ import string
 
 from icon_defs import *
 from X10 import *
-
-# Setup GPIO pin BCM GPIO04
-import RPi.GPIO as GPIO
-GPIO.setmode( GPIO.BCM )
-GPIO.setup( 4, GPIO.IN, pull_up_down=GPIO.PUD_DOWN )	# Next 
-GPIO.setup( 17, GPIO.IN, pull_up_down=GPIO.PUD_DOWN )	# Shutdown
 
 mouseX, mouseY = 0, 0
 mode = 'w'		# Default to weather mode.
@@ -134,33 +129,17 @@ class SmDisplay:
 		self.tmdateYPos = 10		# Time & Date Y Position
 		self.tmdateYPosSm = 18		# Time & Date Y Position Small
 
-		"""
-		# Small Display
-		self.xmax = 656 - 35
-		self.ymax = 416 - 5
-		self.scaleIcon = False		# No icon scaling needed.
-		self.iconScale = 1.0
-		self.subwinTh = 0.065		# Sub window text height
-		self.tmdateTh = 0.125		# Time & Date Text Height
-		self.tmdateSmTh = 0.075
-		self.tmdateYPos = 1		# Time & Date Y Position
-		self.tmdateYPosSm = 8		# Time & Date Y Position Small
-		"""
-
-
-
-
 	####################################################################
 	def __del__(self):
 		"Destructor to make sure pygame shuts down, etc."
 
 	####################################################################
 	def UpdateWeather( self ):
-		# Use NOAA for source data.
+		# Use weather.com for source data.
 		cc = 'current_conditions'
 		f = 'forecasts'
 
-		# This is where the majic happens. 
+		# call to weather.com 
 		self.w = pywapi.get_weather_from_weather_com('55406',units='imperial')
 		w = self.w
 		try:
@@ -424,145 +403,11 @@ class SmDisplay:
 		pygame.display.update()
 
 	####################################################################
-	def disp_calendar(self):
-		# Fill the screen with black
-		self.screen.fill( (0,0,0) )
-		xmin = 10
-		xmax = self.xmax
-		ymax = self.ymax
-		lines = 5
-		lc = (255,255,255) 
-		sfn = "freemono"
-		fn = "freesans"
-
-		# Draw Screen Border
-		pygame.draw.line( self.screen, lc, (xmin,0),(xmax,0), lines )
-		pygame.draw.line( self.screen, lc, (xmin,0),(xmin,ymax), lines )
-		pygame.draw.line( self.screen, lc, (xmin,ymax),(xmax,ymax), lines )
-		pygame.draw.line( self.screen, lc, (xmax,0),(xmax,ymax), lines )
-		pygame.draw.line( self.screen, lc, (xmin,ymax*0.15),(xmax,ymax*0.15), lines )
-
-		# Time & Date
-		th = self.tmdateTh
-		sh = self.tmdateSmTh
-		font = pygame.font.SysFont( fn, int(ymax*th), bold=1 )		# Regular Font
-		sfont = pygame.font.SysFont( fn, int(ymax*sh), bold=1 )	# Small Font for Seconds
-
-		tm1 = time.strftime( "%a, %b %d   %I:%M", time.localtime() )	# 1st part
-		tm2 = time.strftime( "%S", time.localtime() )			# 2nd
-		tm3 = time.strftime( " %P", time.localtime() )			# 
-
-		rtm1 = font.render( tm1, True, lc )
-		(tx1,ty1) = rtm1.get_size()
-		rtm2 = sfont.render( tm2, True, lc )
-		(tx2,ty2) = rtm2.get_size()
-		rtm3 = font.render( tm3, True, lc )
-		(tx3,ty3) = rtm3.get_size()
-
-		tp = xmax / 2 - (tx1 + tx2 + tx3) / 2
-		self.screen.blit( rtm1, (tp,self.tmdateYPos) )
-		self.screen.blit( rtm2, (tp+tx1+3,self.tmdateYPosSm) )
-		self.screen.blit( rtm3, (tp+tx1+tx2,self.tmdateYPos) )
-
-		# Conditions
-		ys = 0.20		# Yaxis Start Pos
-		xs = 0.20		# Xaxis Start Pos
-		gp = 0.075	# Line Spacing Gap
-		th = 0.05		# Text Height
-
-		#cal = calendar.TextCalendar()
-		yr = int( time.strftime( "%Y", time.localtime() ) )	# Get Year
-		mn = int( time.strftime( "%m", time.localtime() ) )	# Get Month
-		cal = calendar.month( yr, mn ).splitlines()
-		i = 0
-		for cal_line in cal:
-			txt = sfont.render( cal_line, True, lc )
-			self.screen.blit( txt, (xmax*xs,ymax*(ys+gp*i)) )
-			i = i + 1
-
-		# Update the display
-		pygame.display.update()
-
-	####################################################################
 	def sPrint( self, s, font, x, l, lc ):
 		f = font.render( s, True, lc )
 		self.screen.blit( f, (x,self.ymax*0.075*l) )
 
 	####################################################################
-	def disp_help( self, inDaylight, dayHrs, dayMins, tDaylight, tDarkness ):
-		# Fill the screen with black
-		self.screen.fill( (0,0,0) )
-		xmax = self.xmax
-		ymax = self.ymax
-		xmin = 10
-		lines = 5
-		lc = (255,255,255) 
-		sfn = "freemono"
-		fn = "freesans"
-
-		# Draw Screen Border
-		pygame.draw.line( self.screen, lc, (xmin,0),(xmax,0), lines )
-		pygame.draw.line( self.screen, lc, (xmin,0),(xmin,ymax), lines )
-		pygame.draw.line( self.screen, lc, (xmin,ymax),(xmax,ymax), lines )
-		pygame.draw.line( self.screen, lc, (xmax,0),(xmax,ymax), lines )
-		pygame.draw.line( self.screen, lc, (xmin,ymax*0.15),(xmax,ymax*0.15), lines )
-
-		thl = self.tmdateTh	# Large Text Height
-		sh = self.tmdateSmTh	# Small Text Height
-
-		# Time & Date
-		font = pygame.font.SysFont( fn, int(ymax*thl), bold=1 )		# Regular Font
-		sfont = pygame.font.SysFont( fn, int(ymax*sh), bold=1 )		# Small Font
-
-		tm1 = time.strftime( "%a, %b %d   %I:%M", time.localtime() )	# 1st part
-		tm2 = time.strftime( "%S", time.localtime() )			# 2nd
-		tm3 = time.strftime( " %P", time.localtime() )			# 
-
-		rtm1 = font.render( tm1, True, lc )
-		(tx1,ty1) = rtm1.get_size()
-		rtm2 = sfont.render( tm2, True, lc )
-		(tx2,ty2) = rtm2.get_size()
-		rtm3 = font.render( tm3, True, lc )
-		(tx3,ty3) = rtm3.get_size()
-
-		tp = xmax / 2 - (tx1 + tx2 + tx3) / 2
-		self.screen.blit( rtm1, (tp,self.tmdateYPos) )
-		self.screen.blit( rtm2, (tp+tx1+3,self.tmdateYPosSm) )
-		self.screen.blit( rtm3, (tp+tx1+tx2,self.tmdateYPos) )
-
-		self.sPrint( "Sunrise: %s" % self.sunrise, sfont, xmax*0.05, 3, lc )
-		self.sPrint( "Sunset: %s" % self.sunset, sfont, xmax*0.05, 4, lc )
-
-		s = "Daylight (Hrs:Min): %d:%02d" % (dayHrs, dayMins)
-		self.sPrint( s, sfont, xmax*0.05, 5, lc )
-
-		if inDaylight: s = "Sunset in (Hrs:Min): %d:%02d" % stot( tDarkness )
-		else:          s = "Sunrise in (Hrs:Min): %d:%02d" % stot( tDaylight )
-		self.sPrint( s, sfont, xmax*0.05, 6, lc )
-
-		s = "Update: %s" % self.wLastUpdate
-		self.sPrint( s, sfont, xmax*0.05, 7, lc )
-
-		cc = 'current_conditions'
-		s = "Current Cond: %s" % self.w[cc]['text']
-		self.sPrint( s, sfont, xmax*0.05, 8, lc )
-		
-		# Outside Temperature
-		s = self.temp + unichr(176) + 'F '
-		s = s + self.baro + 'inHg '
-		s = s + 'Wind ' + self.wind_speed
-		if self.gust != 'N/A': 
-			s = s + '/' + self.gust
-		if self.wind_speed != 'calm':
-			s = s + 'mph @' + self.wind_direction + unichr(176)
-		self.sPrint( s, sfont, xmax*0.05, 9, lc )
-
-		s = "Visability %smi" % self.vis
-		self.sPrint( s, sfont, xmax*0.05, 10, lc )
-
-		# Update the display
-		pygame.display.update()
-
 	
 
 	# Save a jpg image of the screen.
@@ -638,63 +483,9 @@ def Daylight( sr, st ):
 	return ( inDaylight, dayHrs, dayMin, tDaylight, tDarkness )
 
 
-############################################################################
-def btnNext( channel ):
-	global mode, dispTO
-
-	if ( mode == 'c' ): mode = 'w'
-	elif (mode == 'w' ): mode ='h'
-	elif (mode == 'h' ): mode ='c'
-
-	dispTO = 0
-
-	print "Button Event!"
-
 
 #==============================================================
 #==============================================================
-
-try:
-	ser = serial.Serial( "/dev/ttyUSB0", 4800, timeout=2 )
-	serActive = True
-except:
-	serActive = False
-	print "Warning: can't open ttyUSB0 serial port."
-
-if serActive:
-	X10 = False		# Assume no X10 until proven wrong.
-	ser.flushInput()	# Dump any junk that may be there.
-	ser.flushOutput()
-
-	ser.write( chr(0x8b) )	# Querry Status
-	c = ser.read( 1 )	# Wait for something from the CM11A.
-
-	# If an attached CM11A sends a 0xA5 then it requirs a clock reset.
-	if (len(c) == 1):
-		if (ord(c) == 0xA5):
-			X10_SetClock( ser )
-	else:
-		time.sleep( 0.5 )
-
-	# Get the current status from the CM11A X10 module.
-	(X10, c) = X10_Status( ser )
-
-	if X10 == False: print 'Error: CM11A.'
-
-	# If CM11A is present, turn on the lamp A3!
-	if X10 == True:
-		if X10_On( ser, housecode['A'], unitcode['3'] ):
-			print 'X10 On comand OK.'
-		else:
-			print 'Error in X10 On command.'
-		time.sleep( 2 )
-		if X10_Bright( ser, housecode['A'], unitcode['3'] ):
-			print 'X10 Full Bright OK.'
-		else:
-			print 'Error in X10 Bright command.'
-
-#exit()
-
 
 # Display all the available fonts.
 #print "Fonts: ", pygame.font.get_fonts()
@@ -713,51 +504,8 @@ if myDisp.UpdateWeather() == False:
 	print 'Error: no data from Weather.com.'
 	running = False
 
-# Attach GPIO callback to our new button input on pin #4.
-GPIO.add_event_detect( 4, GPIO.RISING, callback=btnNext, bouncetime=400)
-#GPIO.add_event_detect( 17, GPIO.RISING, callback=btnShutdown, bouncetime=100)
-btnShutdownCnt = 0
-
-if GPIO.input( 17 ):
-	print "Warning: Shutdown Switch is Active!"
-	myDisp.screen.fill( (0,0,0) )
-	icon = pygame.image.load(sd + 'shutdown.jpg')
-	(ix,iy) = icon.get_size()
-	myDisp.screen.blit( icon, (800/2-ix/2,400/2-iy/2) )
-	font = pygame.font.SysFont( "freesans", 40, bold=1 )
-	rf = font.render( "Please toggle shutdown siwtch.", True, (255,255,255) )
-	(tx1,ty1) = rf.get_size()
-	myDisp.screen.blit( rf, (800/2-tx1/2,iy+20) )
-	pygame.display.update()
-	pygame.time.wait( 1000 )
-	while GPIO.input( 17 ): pygame.time.wait(100)
-
-
-
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 while running:
-
-	# Debounce the shutdown switch. The main loop rnus at 100ms. So, if the 
-	# button (well, a switch really) counter "btnShutdownCnt" counts above
-	# 25 then the switch must have been on continuously for 2.5 seconds.
-	if GPIO.input( 17 ):
-		btnShutdownCnt += 1
-		if btnShutdownCnt > 25:
-			print "Shutdown!"
-			myDisp.screen.fill( (0,0,0) )
-			icon = pygame.image.load(sd + 'shutdown.jpg')
-			(ix,iy) = icon.get_size()
-			myDisp.screen.blit( icon, (800/2-ix/2,400/2-iy/2) )
-			font = pygame.font.SysFont( "freesans", 60, bold=1 )
-			rtm1 = font.render( "Shuting Down!", True, (255,255,255) )
-			(tx1,ty1) = rtm1.get_size()
-			myDisp.screen.blit( rtm1, (800/2-tx1/2,iy+20) )
-			pygame.display.update()
-			pygame.time.wait( 1000 )
-			#os.system("sudo shutdown -h now")
-			while GPIO.input( 17 ): pygame.time.wait(100)
-	else:
-		btnShutdownCnt = 0
 
 	# Look for and process keyboard events to change modes.
 	for event in pygame.event.get():
@@ -765,11 +513,6 @@ while running:
 			# On 'q' or keypad enter key, quit the program.
 			if (( event.key == K_KP_ENTER ) or (event.key == K_q)):
 				running = False
-
-			# On 'c' key, set mode to 'calendar'.
-			elif ( event.key == K_c ):
-				mode = 'c'
-				dispTO = 0
 
 			# On 'w' key, set mode to 'weather'.
 			elif ( event.key == K_w ):
@@ -780,11 +523,6 @@ while running:
 			elif ( event.key == K_s ):
 				myDisp.screen_cap()
 
-			# On 'h' key, set mode to 'help'.
-			elif ( event.key == K_h ):
-				mode = 'h'
-				dispTO = 0
-
 	# Automatically switch back to weather display after a couple minutes.
 	if mode != 'w':
 		dispTO += 1
@@ -793,12 +531,6 @@ while running:
 	else:
 		dispTO = 0
 
-	# Calendar Display Mode
-	if ( mode == 'c' ):
-		# Update / Refresh the display after each second.
-		if ( s != time.localtime().tm_sec ):
-			s = time.localtime().tm_sec
-			myDisp.disp_calendar()
 		
 	# Weather Display Mode
 	if ( mode == 'w' ):
@@ -812,40 +544,9 @@ while running:
 		if ( s == 0 ):
 			myDisp.UpdateWeather()
 
-	if ( mode == 'h'):
-		# Pace the screen updates to once per second.
-		if s != time.localtime().tm_sec:
-			s = time.localtime().tm_sec		
-
-			( inDaylight, dayHrs, dayMins, tDaylight, tDarkness) = Daylight( myDisp.sunrise, myDisp.sunset )
-
-			#if inDaylight:
-			#	print "Time until dark (Hr:Min) -> %d:%d" % stot( tDarkness )
-			#else:
-			#	#print 'tDaylight ->', tDaylight
-			#	print "Time until daybreak (Hr:Min) -> %d:%d" % stot( tDaylight )
-
-			# Stat Screen Display.
-			myDisp.disp_help( inDaylight, dayHrs, dayMins, tDaylight, tDarkness )
-		# Refresh the weather data once per minute.
-		if ( int(s) == 0 ): myDisp.UpdateWeather()
 
 	( inDaylight, dayHrs, dayMins, tDaylight, tDarkness) = Daylight( myDisp.sunrise, myDisp.sunset )
 
-	if serActive:	
-		h = housecode['A']
-		u = unitcode['3']
-
-		if time.localtime().tm_sec == 30:
-			if ( inDaylight == False ): 
-				X10_On( ser, h, u )
-				print "X10 On"
-			else: 
-				X10_Off( ser, h, u )
-				print "X10 Off"
-		if time.localtime().tm_sec == 40:
-			if ( inDaylight == False ):
-				X10_Bright( ser, housecode['A'], unitcode['3'] )
 	
 	# Loop timer.
 	pygame.time.wait( 100 )
