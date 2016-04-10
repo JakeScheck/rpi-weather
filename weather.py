@@ -217,14 +217,14 @@ class SmDisplay:
 
 	####################################################################
 	def disp_weather(self):
-		# Fill the screen with gray
-		self.screen.fill( (200,200,200) )
+		# Fill the screen with black
+		self.screen.fill( (0,0,0) )
 		xmin = 0
 		xmax = self.xmax
 		ymax = self.ymax
 		lines = 5
-		lc = (0,0,0) 
-		fc = (0,0,0) #font color
+		lc = (255,255,255) 
+		fc = (255,255,255) #font color
 		fn = "freesans"
 
 		# Draw Screen Border
@@ -348,7 +348,7 @@ class SmDisplay:
 			yo = (90 - iy) / 2 
 		else: 
 			yo = 0
-		self.screen.blit( icon, (xmax*wx-ix/2,ymax*(wy+gp*1)+yo) ) # was wy+gp*1.2
+		self.screen.blit( icon, (xmax*wx-ix/2,ymax*(wy+gp*0.8)+yo) ) # was wy+gp*1.2
 
 		# Sub Window 2
 		txt = font.render( self.day[1]+':', True, fc )
@@ -371,7 +371,7 @@ class SmDisplay:
 			yo = (90 - iy) / 2 
 		else: 
 			yo = 0
-		self.screen.blit( icon, (xmax*wx*3-ix/2,ymax*(wy+gp*1.2)+yo) )
+		self.screen.blit( icon, (xmax*wx*3-ix/2,ymax*(wy+gp*0.8)+yo) )
 
 		# Sub Window 3
 		txt = font.render( self.day[2]+':', True, fc )
@@ -394,7 +394,7 @@ class SmDisplay:
 			yo = (90 - iy) / 2 
 		else: 
 			yo = 0
-		self.screen.blit( icon, (xmax*wx*5-ix/2,ymax*(wy+gp*1.2)+yo) )
+		self.screen.blit( icon, (xmax*wx*5-ix/2,ymax*(wy+gp*0.8)+yo) )
 
 		# Sub Window 4
 		txt = font.render( self.day[3]+':', True, fc )
@@ -417,7 +417,7 @@ class SmDisplay:
 			yo = (90 - iy) / 2 
 		else: 
 			yo = 0
-		self.screen.blit( icon, (xmax*wx*7-ix/2,ymax*(wy+gp*1.2)+yo) )
+		self.screen.blit( icon, (xmax*wx*7-ix/2,ymax*(wy+gp*0.8)+yo) )
 
 		# Update the display
 		pygame.display.update()
